@@ -13,76 +13,43 @@ class TodoProvider with ChangeNotifier{
     return [..._items];
   }
 
-  // Future<void> addTodo(String task) async {
-  //   if(task.isEmpty){
-  //     return;
-  //   }
-  //   Map<String, dynamic > request = {"name": task, "is_executed": false};
-  //   final headers = {'Content-Type': 'application/json'};
-  //   final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(request));
-  //   Map<String, dynamic> responsePayload = json.decode(response.body);
-  //   final todo = TodoItem(
-  //       id: responsePayload["id"],
-  //       itemName: responsePayload["name"],
-  //       isExecuted: responsePayload["is_executed"]
-  //   );
-  //   _items.add(todo);
-  //   notifyListeners();
-  // }
-
-  Future<void> newAddTodo(Map<String, String> event) async {
-    Map<String, dynamic > request = {"name": event['name'] , 
-                                      "start": event['start'], 
-                                      "end": event['end'], 
-                                      "location": event['location'],
-                                      "description": event['description'],
-                                      "is_executed": false};
+  Future<void> addTodo(Map<String, String> event) async {
+    Map<String, dynamic> request = {
+      "eventName": event['name'] , 
+      "eventStart": event['start'], 
+      "eventEnd": event['end'], 
+      "eventLocation": event['location'],
+      "eventDescription": event['description'],
+      "is_executed": false
+    };
     final headers = {'Content-Type': 'application/json'};
     final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(request));
     Map<String, dynamic> responsePayload = json.decode(response.body);
     final todo = TodoItem(
         id: responsePayload["id"],
-        eventName: responsePayload["name"],
-        eventStart: responsePayload["start"],
-        eventEnd: responsePayload["end"],
-        eventLocation: responsePayload["location"],
-        eventDescription: responsePayload["description"],
+        eventName: responsePayload["eventName"],
+        eventStart: responsePayload["eventStart"],
+        eventEnd: responsePayload["eventEnd"],
+        eventLocation: responsePayload["eventLocation"],
+        eventDescription: responsePayload["eventDescription"],
         isExecuted: responsePayload["is_executed"]
     );
     _items.add(todo);
     notifyListeners();
   }
 
-  // Future<void> get getTodos async {
-  //   http.Response response;
-  //   try{
-  //     response = await http.get(Uri.parse(url));
-  //     List<dynamic> body = json.decode(response.body);
-  //     _items = body.map((e) => TodoItem(
-  //         id: e['id'],
-  //         itemName: e['name'],
-  //         isExecuted: e['is_executed']
-  //     )
-  //     ).toList();
-  //   }catch(e){
-  //     print(e);
-  //   }
-
-  //   notifyListeners();
-  // }
-
-  Future<void> get newGetTodos async {
+  Future<void> get getTodos async {
     http.Response response;
     try{
       response = await http.get(Uri.parse(url));
       List<dynamic> body = json.decode(response.body);
       _items = body.map((e) => TodoItem(
           id: e['id'],
-          eventName: e['name'],
-          eventStart: e['start'],
-          eventEnd: e['end'],
-          eventLocation: e['location'],
-          eventDescription: e['description'],
+          eventName: e['eventName'],
+          eventStart: e['eventStart'],
+          eventEnd: e['eventEnd'],
+          eventLocation: e['eventLocation'],
+          eventDescription: e['eventDescription'],
           isExecuted: e['is_executed']
       )
       ).toList();
@@ -110,9 +77,9 @@ class TodoProvider with ChangeNotifier{
       final response = await http.patch(Uri.parse("$url/$todoId"));
       Map<String, dynamic> responsePayload = json.decode(response.body);
       for (var element in _items) {
-      if(element.id == responsePayload["id"]){
-          element.isExecuted = responsePayload["is_executed"];
-      }
+        if(element.id == responsePayload["id"]){
+            element.isExecuted = responsePayload["is_executed"];
+        }
       } 
     }catch(e){
       print(e);

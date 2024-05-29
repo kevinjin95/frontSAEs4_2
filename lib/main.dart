@@ -249,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 };
               });
               Navigator.pop(context);
-              Provider.of<TodoProvider>(context, listen: false).newAddTodo(newEvent);
+              Provider.of<TodoProvider>(context, listen: false).addTodo(newEvent);
               newTaskController.clear();
             },
             child: Text(event == null ? 'Ajouter' : 'Modifier'),
