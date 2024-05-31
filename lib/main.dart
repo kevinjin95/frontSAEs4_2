@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => TodoProvider(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Calendrier avec Événements',
         theme: ThemeData(
           primarySwatch: Colors.blue,
