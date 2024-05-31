@@ -40,18 +40,21 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
   // final Map<DateTime, List<Map<String, String>>> _events = {};
-  Map<String, String> newEvent = {
+  Map<String, dynamic> newEvent = {
   'name': '',
   'start': '',
   'end': '',
   'location': '',
-  'description': ''
+  'description': '',
+  'year': 0,
+  'month': 0,
+  'day': 0,
   };
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TodoProvider>(context, listen: false).getTodos2(_focusedDay);
+      Provider.of<TodoProvider>(context, listen: false).getTodos(_focusedDay);
     });
   }
 
@@ -89,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               _selectedDay = selectedDay;
                               _focusedDay = focusedDay;
                             });
-                            Provider.of<TodoProvider>(context, listen: false).getTodos2(selectedDay);
+                            Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
                             },
                           calendarStyle: CalendarStyle(
                             isTodayHighlighted: true,
@@ -175,6 +178,10 @@ class _MyHomePageState extends State<MyHomePage> {
     TextEditingController endController = TextEditingController(text: event?['end'] ?? '');
     TextEditingController locationController = TextEditingController(text: event?['location'] ?? '');
     TextEditingController descriptionController = TextEditingController(text: event?['description'] ?? '');
+    // TextEditingController yearController = TextEditingController(text: event?['year'] ?? '');
+    // TextEditingController monthController = TextEditingController(text: event?['month'] ?? '');
+    // TextEditingController dayController = TextEditingController(text: event?['day'] ?? '');
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(

@@ -13,13 +13,16 @@ class TodoProvider with ChangeNotifier{
     return [..._items];
   }
 
-  Future<void> addTodo(Map<String, String> event) async {
+  Future<void> addTodo(Map<String, dynamic> event) async {
     Map<String, dynamic> request = {
       "eventName": event['name'] , 
       "eventStart": event['start'], 
       "eventEnd": event['end'], 
       "eventLocation": event['location'],
       "eventDescription": event['description'],
+      "eventYear": event['year'],
+      "eventMonth": event['month'],
+      "eventDay": event['day'],
       "is_executed": false
     };
     final headers = {'Content-Type': 'application/json'};
@@ -32,32 +35,46 @@ class TodoProvider with ChangeNotifier{
         eventEnd: responsePayload["eventEnd"],
         eventLocation: responsePayload["eventLocation"],
         eventDescription: responsePayload["eventDescription"],
+        eventYear: responsePayload["eventYear"],
+        eventMonth: responsePayload["eventMonth"],
+        eventDay: responsePayload["eventDay"],
         isExecuted: responsePayload["is_executed"]
     );
     _items.add(todo);
     notifyListeners();
   }
 
-  Future<void> get getTodos async {
+ Future<void> getTodos(DateTime selectedDay) async {
     http.Response response;
-    try{
-      response = await http.get(Uri.parse(url));
+    try {
+      // Convert the selected date to a string in the format 'yyyy-MM-dd'
+      String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
+      
+      // Append the date as a query parameter to the URL
+      String requestUrl = "$url?date=$formattedDate";
+      
+      response = await http.get(Uri.parse(requestUrl));
       List<dynamic> body = json.decode(response.body);
+      
       _items = body.map((e) => TodoItem(
-          id: e['id'],
-          eventName: e['eventName'],
-          eventStart: e['eventStart'],
-          eventEnd: e['eventEnd'],
-          eventLocation: e['eventLocation'],
-          eventDescription: e['eventDescription'],
-          isExecuted: e['is_executed']
-      )
-      ).toList();
-    }catch(e){
+        id: e['id'],
+        eventName: e['eventName'],
+        eventStart: e['eventStart'],
+        eventEnd: e['eventEnd'],
+        eventLocation: e['eventLocation'],
+        eventDescription: e['eventDescription'],
+        eventYear: e['eventYear'],
+        eventMonth: e['eventMonth'],
+        eventDay: e['eventDay'],
+        isExecuted: e['is_executed']
+      )).toList();
+    } catch (e) {
       print(e);
     }
     notifyListeners();
   }
+
+
 
   Future<void> deleteTodo(int todoId) async {
     http.Response response;
@@ -87,31 +104,31 @@ class TodoProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  
-  Future<void> getTodos2(DateTime selectedDay) async {
-    http.Response response;
-    try {
-      // Convert the selected date to a string in the format 'yyyy-MM-dd'
-      String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
+//fonction à garder !!!!!!!!!!!
+//   Future<void> getTodos2(DateTime selectedDay) async {
+//     http.Response response;
+//     try {
+//       // Convert the selected date to a string in the format 'yyyy-MM-dd'
+//       String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
       
-      // Append the date as a query parameter to the URL
-      String requestUrl = "$url?date=$formattedDate";
+//       // Append the date as a query parameter to the URL
+//       String requestUrl = "$url?date=$formattedDate";
       
-      response = await http.get(Uri.parse(requestUrl));
-      List<dynamic> body = json.decode(response.body);
+//       response = await http.get(Uri.parse(requestUrl));
+//       List<dynamic> body = json.decode(response.body);
       
-      _items = body.map((e) => TodoItem(
-        id: e['id'],
-        eventName: e['eventName'],
-        eventStart: e['eventStart'],
-        eventEnd: e['eventEnd'],
-        eventLocation: e['eventLocation'],
-        eventDescription: e['eventDescription'],
-        isExecuted: e['is_executed']
-      )).toList();
-    } catch (e) {
-      print(e);
-    }
-    notifyListeners();
-  }
+//       _items = body.map((e) => TodoItem(
+//         id: e['id'],
+//         eventName: e['eventName'],
+//         eventStart: e['eventStart'],
+//         eventEnd: e['eventEnd'],
+//         eventLocation: e['eventLocation'],
+//         eventDescription: e['eventDescription'],
+//         isExecuted: e['is_executed']
+//       )).toList();
+//     } catch (e) {
+//       print(e);
+//     }
+//     notifyListeners();
+//   }
 }
