@@ -86,4 +86,32 @@ class TodoProvider with ChangeNotifier{
     }
     notifyListeners();
   }
+
+  
+  Future<void> getTodos2(DateTime selectedDay) async {
+    http.Response response;
+    try {
+      // Convert the selected date to a string in the format 'yyyy-MM-dd'
+      String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
+      
+      // Append the date as a query parameter to the URL
+      String requestUrl = "$url?date=$formattedDate";
+      
+      response = await http.get(Uri.parse(requestUrl));
+      List<dynamic> body = json.decode(response.body);
+      
+      _items = body.map((e) => TodoItem(
+        id: e['id'],
+        eventName: e['eventName'],
+        eventStart: e['eventStart'],
+        eventEnd: e['eventEnd'],
+        eventLocation: e['eventLocation'],
+        eventDescription: e['eventDescription'],
+        isExecuted: e['is_executed']
+      )).toList();
+    } catch (e) {
+      print(e);
+    }
+    notifyListeners();
+  }
 }

@@ -45,7 +45,7 @@ class _TasksWidgetState extends State<TasksWidget> {
             ],
           ),
           FutureBuilder(
-            future: Provider.of<TodoProvider>(context, listen: false).newGetTodos,
+            future: Provider.of<TodoProvider>(context, listen: false).getTodos,
             builder: (ctx, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(child: CircularProgressIndicator())
