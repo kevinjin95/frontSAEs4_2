@@ -33,8 +33,8 @@ class _TasksWidgetState extends State<TasksWidget> {
               const SizedBox(width: 10,),
               ElevatedButton(
                   style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.amberAccent),
-                      foregroundColor: MaterialStateProperty.all(Colors.purple)
+                      backgroundColor: WidgetStateProperty.all(Colors.amberAccent),
+                      foregroundColor: WidgetStateProperty.all(Colors.purple)
                   ),
                   child: const Text("Add"),
                   onPressed: () {
@@ -45,7 +45,7 @@ class _TasksWidgetState extends State<TasksWidget> {
             ],
           ),
           FutureBuilder(
-            future: Provider.of<TodoProvider>(context, listen: false).getTodos,
+            future: Provider.of<TodoProvider>(context, listen: false).getTodos(DateTime.now()),
             builder: (ctx, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? const Center(child: CircularProgressIndicator())
@@ -79,6 +79,7 @@ class _TasksWidgetState extends State<TasksWidget> {
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: ()  {
                                 Provider.of<TodoProvider>(context, listen: false).deleteTodo(todoProvider.items[i].id);
+                                setState(() {});
                               }
                           ),
                           onTap: () {},
