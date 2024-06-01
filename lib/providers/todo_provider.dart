@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http; // requetes HTTP
 
 import 'package:todo/models/todo_item.dart'; // Modele des taches
@@ -20,9 +20,9 @@ class TodoProvider with ChangeNotifier{
       "eventEnd": event['end'], 
       "eventLocation": event['location'],
       "eventDescription": event['description'],
-      "eventYear": event['year'],
-      "eventMonth": event['month'],
-      "eventDay": event['day'],
+      //"eventYear": event['year'],
+      //"eventMonth": event['month'],
+      //"eventDay": event['day'],
       "is_executed": false
     };
     final headers = {'Content-Type': 'application/json'};
@@ -35,9 +35,9 @@ class TodoProvider with ChangeNotifier{
         eventEnd: responsePayload["eventEnd"],
         eventLocation: responsePayload["eventLocation"],
         eventDescription: responsePayload["eventDescription"],
-        eventYear: responsePayload["eventYear"],
-        eventMonth: responsePayload["eventMonth"],
-        eventDay: responsePayload["eventDay"],
+        // eventYear: responsePayload["eventYear"],
+        // eventMonth: responsePayload["eventMonth"],
+        // eventDay: responsePayload["eventDay"],
         isExecuted: responsePayload["is_executed"]
     );
     _items.add(todo);
@@ -63,30 +63,37 @@ class TodoProvider with ChangeNotifier{
         eventEnd: e['eventEnd'],
         eventLocation: e['eventLocation'],
         eventDescription: e['eventDescription'],
-        eventYear: e['eventYear'],
-        eventMonth: e['eventMonth'],
-        eventDay: e['eventDay'],
+        // eventYear: e['eventYear'],
+        // eventMonth: e['eventMonth'],
+        // eventDay: e['eventDay'],
         isExecuted: e['is_executed']
       )).toList();
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
+      rethrow; // Renvoie l'erreur à l'appelant
     }
     notifyListeners();
   }
 
 
 
-  Future<void> deleteTodo(int todoId) async {
-    http.Response response;
-    try{
-      response = await http.delete(Uri.parse("$url/$todoId"));
-      final body = json.decode(response.body);
-      _items.removeWhere((element) => element.id == body["id"]);
-      notifyListeners();
-    }catch(e){
-      print(e);
+  Future<void> deleteTodo(int id) async {
+    try {
+      final response = await http.delete(Uri.parse('$url/$id'));
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        _items.removeWhere((item) => item.id == body['id']);
+        notifyListeners();
+      } else {
+        throw Exception('Failed to delete task');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
     }
-    notifyListeners();
   }
 
   Future<void> executeTask(int todoId) async {
@@ -99,7 +106,9 @@ class TodoProvider with ChangeNotifier{
         }
       } 
     }catch(e){
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
     }
     notifyListeners();
   }
