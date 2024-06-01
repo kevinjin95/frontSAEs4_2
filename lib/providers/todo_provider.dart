@@ -82,9 +82,12 @@ class TodoProvider with ChangeNotifier{
   Future<void> deleteTodo(int id) async {
     try {
       final response = await http.delete(Uri.parse('$url/$id'));
+      if (kDebugMode) {
+        print('Server response: ${response.body}');
+      } // Ajoutez cette ligne
+
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        _items.removeWhere((item) => item.id == body['id']);
+        _items.removeWhere((item) => item.id == id);
         notifyListeners();
       } else {
         throw Exception('Failed to delete task');
