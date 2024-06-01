@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class TodoItem{
   dynamic id;
   String eventName;
@@ -7,9 +5,9 @@ class TodoItem{
   String eventEnd;
   String eventLocation;
   String eventDescription;
-  Int eventYear;
-  Int eventMonth;
-  Int eventDay;
+  int eventYear;
+  int eventMonth;
+  int eventDay;
   bool isExecuted;
   TodoItem({this.id, required this.eventName, 
                     required this.eventStart,
