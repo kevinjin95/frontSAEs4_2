@@ -31,28 +31,39 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // Contrôleur pour le champ de texte de la nouvelle tâche
   TextEditingController newTaskController = TextEditingController();
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  // Format du calendrier
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  // Jour sélectionné dans le calendrier
   DateTime? _selectedDay;
+
+  // Jour actuellement en focus dans le calendrier
   DateTime _focusedDay = DateTime.now();
-  // final Map<DateTime, List<Map<String, String>>> _events = {};
+
+  // Nouvel événement à ajouter
   Map<String, dynamic> newEvent = {
-  'name': '',
-  'start': '',
-  'end': '',
-  'location': '',
-  'description': '',
-  'year': 0,
-  'month': 0,
-  'day': 0,
+    'name': '',
+    'start': '',
+    'end': '',
+    'location': '',
+    'description': '',
+    // 'year': 0,
+    // 'month': 0,
+    // 'day': 0,
   };
+
   @override
   void initState() {
     super.initState();
+    // Après la construction du widget, on récupère les tâches pour le jour en focus
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TodoProvider>(context, listen: false).getTodos(_focusedDay);
     });
@@ -73,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: Row(
               children: [
-                // Column for the calendar
+                // Colonne pour le calendrier
                 Expanded(
                   flex: 1,
                   child: Column(
@@ -85,26 +96,27 @@ class _MyHomePageState extends State<MyHomePage> {
                           lastDay: DateTime(2030),
                           calendarFormat: _calendarFormat,
                           selectedDayPredicate: (day) {
+                            // Vérifie si le jour est le même que le jour sélectionné
                             return isSameDay(_selectedDay, day);
                           },
                           onDaySelected: (selectedDay, focusedDay) {
+                            // Met à jour le jour sélectionné et le jour en focus
                             setState(() {
                               _selectedDay = selectedDay;
                               _focusedDay = focusedDay;
                             });
+                            // Récupère les tâches pour le jour sélectionné
                             Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
-                            },
-                          calendarStyle: CalendarStyle(
+                          },
+                          calendarStyle: const CalendarStyle(
                             isTodayHighlighted: true,
                             selectedDecoration: BoxDecoration(
                               color: Colors.blue,
                               shape: BoxShape.circle,
-                              // borderRadius: BorderRadius.circular(5.0),
                             ),
                             todayDecoration: BoxDecoration(
                               color: Colors.orange,
                               shape: BoxShape.circle,
-                              // borderRadius: BorderRadius.circular(5.0),
                             ),
                           ),
                         ),
@@ -113,24 +125,23 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(1.0),
                         child: ElevatedButton(
                           onPressed: () => _showAddEventDialog(_selectedDay!),
-                            
                           child: const Text('Ajouter un évènement'),
-                          
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Column for the events
+                // Colonne pour les événements
                 Expanded(
                   flex: 1,
                   child: Consumer<TodoProvider>(
                     builder: (context, todoProvider, child) {
+                      // Récupère les événements pour le jour sélectionné
                       var eventsForSelectedDay = todoProvider.items.where((item) {
                         return isSameDay(_selectedDay, _selectedDay);
                       }).toList();
                       return _selectedDay == null
-                          ? Center(child: Text('Sélectionnez une date pour voir les événements'))
+                          ? const Center(child: Text('Sélectionnez une date pour voir les événements'))
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -138,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
                                     'Événements pour ${_selectedDay!.day}/${_selectedDay!.month}/${_selectedDay!.year}',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, ),
+                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -148,12 +159,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                     itemBuilder: (context, index) {
                                       var event = eventsForSelectedDay[index];
                                       return Card(
-                                        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                                         child: ListTile(
                                           title: Text(event.eventName),
                                           subtitle: Text(
                                               '${event.eventStart} - ${event.eventEnd}\n${event.eventLocation}\n${event.eventDescription}'),
-                                          trailing: Icon(Icons.event),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.event),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete), //icône pour supprimer
+                                                onPressed: () {
+                                                  todoProvider.deleteTodo(event.id);
+                                                  setState(() {}); //pour déclencher la reconstruction du widget?
+                                                },
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },
@@ -172,7 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showAddEventDialog(DateTime selectedDay, {Map<String, String>? event, int? index}) {
+
+
+  void _showAddEventDialog(DateTime selectedDay, {Map<String, String>? event}) {
     TextEditingController nameController = TextEditingController(text: event?['name'] ?? '');
     TextEditingController startController = TextEditingController(text: event?['start'] ?? '');
     TextEditingController endController = TextEditingController(text: event?['end'] ?? '');
@@ -207,6 +232,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     initialTime: TimeOfDay.now(),
                   );
                   if (time != null) {
+                    // ignore: use_build_context_synchronously
                     startController.text = time.format(context);
                   }
                 },
@@ -222,6 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     initialTime: TimeOfDay.now(),
                   );
                   if (time != null) {
+                    // ignore: use_build_context_synchronously
                     endController.text = time.format(context);
                   }
                 },
