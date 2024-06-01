@@ -88,7 +88,6 @@ class TodoProvider with ChangeNotifier{
 
       if (response.statusCode == 200) {
         _items.removeWhere((item) => item.id == id);
-        notifyListeners();
       } else {
         throw Exception('Failed to delete task');
       }
@@ -97,6 +96,7 @@ class TodoProvider with ChangeNotifier{
         print('Error: $e');
       }
     }
+    notifyListeners();
   }
 
   Future<void> executeTask(int todoId) async {

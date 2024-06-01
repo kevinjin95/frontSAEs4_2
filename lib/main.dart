@@ -60,12 +60,18 @@ class _MyHomePageState extends State<MyHomePage> {
     // 'day': 0,
   };
 
+  // valeur de l'id à supprimer
+  int id = 0; 
+
   @override
   void initState() {
     super.initState();
     // Après la construction du widget, on récupère les tâches pour le jour en focus
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TodoProvider>(context, listen: false).getTodos(_focusedDay);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TodoProvider>(context, listen: false).deleteTodo(id);
     });
   }
 
@@ -167,12 +173,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                           trailing: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              const Icon(Icons.event),
+                                              IconButton(
+                                                icon: const Icon(Icons.assignment_add), //icône pour supprimer
+                                                onPressed: () {
+                                                  //todoProvider.deleteTodo(event.id);
+                                                  // setState(() {
+                                                  //   id = event.id;
+                                                  //   }); //pour déclencher la reconstruction du widget?
+                                                },
+                                              ),
                                               IconButton(
                                                 icon: const Icon(Icons.delete), //icône pour supprimer
                                                 onPressed: () {
                                                   todoProvider.deleteTodo(event.id);
-                                                  setState(() {}); //pour déclencher la reconstruction du widget?
+                                                  setState(() {
+                                                    id = event.id;
+                                                    }); //pour déclencher la reconstruction du widget?
                                                 },
                                               ),
                                             ],
@@ -194,8 +210,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-
 
   void _showAddEventDialog(DateTime selectedDay, {Map<String, String>? event}) {
     TextEditingController nameController = TextEditingController(text: event?['name'] ?? '');
