@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/todo_item.dart';
@@ -17,11 +18,11 @@ class MyApp extends StatelessWidget {
       create: (_) => TodoProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Calendrier avec Événements',
+        title: 'In Time',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MyHomePage(title: 'Todo app'),
+        home: const MyHomePage(title: 'Planificateur'),
       ),
     );
   }
@@ -151,12 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Consumer<TodoProvider>(
                     builder: (context, todoProvider, child) {
                       // Récupère les événements pour le jour sélectionné
-                      print("pommr");
-                      
-                        // eventsForSelectedDay = Provider.of<TodoProvider>(context, listen: false).items.where((item) {
-                        //   return isSameDay(_selectedDay, item.date);
-                        // }).toList();
-                      
+                      if (kDebugMode) {
+                        print("pomme"); //
+                      }
                       return _selectedDay == null
                           ? const Center(child: Text('Sélectionnez une date pour voir les événements'))
                           : Column(
@@ -190,19 +188,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   //todoProvider.deleteTodo(event.id);
                                                   // setState(() {
                                                   //   id = event.id;
-                                                  //   }); //pour déclencher la reconstruction du widget?
-                                                
+                                                  //   }); //pour déclencher la reconstruction du widget on le fait en bas   
                                               ),
                                               IconButton(
                                                 icon: const Icon(Icons.delete), //icône pour supprimer
                                                 onPressed: () {
                                                   //pour déclencher la reconstruction du widget?
-                                                  todoProvider.deleteTodo(event.id).then((value) {
-                                                  Provider.of<TodoProvider>(context, listen: false).getTodos(_selectedDay!).then((value) {
-                                                    setState(() {
-                                                      eventsForSelectedDay = todoProvider.items.where((item) {
-                                                        return isSameDay(_selectedDay, item.date);
-                                                      }).toList();
+                                                  todoProvider.deleteTodo(event.id).then((value) { //on supprime en premier, then?
+                                                  Provider.of<TodoProvider>(context, listen: false).getTodos(_selectedDay!).then((value) { //getTodos recupere les events à la date et donc il fait un -1 avec l'event choisi
+                                                    setState(() { //permet de récupérer une liste à jour - l'event qu'on a supprimé 
+                                                      eventsForSelectedDay = todoProvider.items.where((item) { //where c une boucle, for element(=item) in list
+                                                        return isSameDay(_selectedDay, item.date);//retourner true ou false en faisant une comparaison _selectedDay et item.date, si c true litem est rentré dans eventforSelectedDay (comme un foreach) remonte d'une ligne et la ligne du dessus ajoute l'event en question
+                                                      }).toList(); //transformer en liste 
                                                     });
                                                   },);
 
@@ -325,7 +322,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   'day': selectedDay.day,
                 };
               });
-              Provider.of<TodoProvider>(context, listen: false).addTodo(newEvent).then((value) {
+              Provider.of<TodoProvider>(context, listen: false).addTodo(newEvent).then((value) { //package provider
                 Navigator.pop(context);
                 
               });
@@ -339,8 +336,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showEditEventDialog(DateTime selectedDay, TodoItem event) {
-    TextEditingController nameController = TextEditingController(text: event.eventName);
+  void _showEditEventDialog(DateTime selectedDay, TodoItem event) { //permet de modifier l'event quand j'appuie sur l'icone (ouvre la boîte ), les parametres sont différents, autocomplete ce qu'il y a deja dans la BDD
+    TextEditingController nameController = TextEditingController(text: event.eventName); 
     TextEditingController startController = TextEditingController(text: event.eventStart);
     TextEditingController endController = TextEditingController(text: event.eventEnd);
     TextEditingController locationController = TextEditingController(text: event.eventLocation);
@@ -423,7 +420,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   descriptionController.text.isEmpty) {
                 return;
               }
-              setState(() {
+              setState(() { //le met à jour ici l'evènement modifier (rajouter des éclaircissements)
                 newEvent = {
                   'name': nameController.text,
                   'start': startController.text,
@@ -435,10 +432,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   'day': selectedDay.day,
                 };
               });
-              Provider.of<TodoProvider>(context, listen: false).editTodo(event.id, newEvent).then((value) {
+              Provider.of<TodoProvider>(context, listen: false).editTodo(event.id, newEvent).then((value) { //edit appelle getTodo
               Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
-                Navigator.pop(context);
-                
+                Navigator.pop(context); //navigator.pop fonction qui permet de revenir à l’écran précédent. 
+                // Elle est utilisée avec Navigator.push(), qui ajoute un nouvel écran à la pile de navigation.
               });
               newTaskController.clear();
             },
