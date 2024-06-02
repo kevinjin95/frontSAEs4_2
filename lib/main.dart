@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/models/todo_item.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -63,10 +64,19 @@ class _MyHomePageState extends State<MyHomePage> {
   // valeur de l'id à supprimer
   int id = 0; 
 
+  List<TodoItem> eventsForSelectedDay = [];
+
   @override
   void initState() {
     super.initState();
     // Après la construction du widget, on récupère les tâches pour le jour en focus
+    Provider.of<TodoProvider>(context, listen: false).addListener(() {
+      setState(() {
+        eventsForSelectedDay = Provider.of<TodoProvider>(context, listen: false).items.where((item) {
+          return isSameDay(_selectedDay, item.date);
+        }).toList();
+      }); 
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TodoProvider>(context, listen: false).getTodos(_focusedDay);
     });
@@ -74,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -141,9 +152,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context, todoProvider, child) {
                       // Récupère les événements pour le jour sélectionné
                       print("pommr");
-                      var eventsForSelectedDay = todoProvider.items.where((item) {
-                        return isSameDay(_selectedDay, item.date);
-                      }).toList();
+                      
+                        // eventsForSelectedDay = Provider.of<TodoProvider>(context, listen: false).items.where((item) {
+                        //   return isSameDay(_selectedDay, item.date);
+                        // }).toList();
+                      
                       return _selectedDay == null
                           ? const Center(child: Text('Sélectionnez une date pour voir les événements'))
                           : Column(
@@ -184,8 +197,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 icon: const Icon(Icons.delete), //icône pour supprimer
                                                 onPressed: () {
                                                   //pour déclencher la reconstruction du widget?
-                                                  todoProvider.deleteTodo(event.id);
-                                                  
+                                                  todoProvider.deleteTodo(event.id).then((value) {
+                                                  Provider.of<TodoProvider>(context, listen: false).getTodos(_selectedDay!).then((value) {
+                                                    setState(() {
+                                                      eventsForSelectedDay = todoProvider.items.where((item) {
+                                                        return isSameDay(_selectedDay, item.date);
+                                                      }).toList();
+                                                    });
+                                                  },);
+
+                                                  });
                                                 },
                                               ),
                                             ],
@@ -304,8 +325,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   'day': selectedDay.day,
                 };
               });
-              Navigator.pop(context);
-              Provider.of<TodoProvider>(context, listen: false).addTodo(newEvent);
+              Provider.of<TodoProvider>(context, listen: false).addTodo(newEvent).then((value) {
+                Navigator.pop(context);
+                
+              });
+              Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
               newTaskController.clear();
             },
             child: Text(event == null ? 'Ajouter' : 'Modifier'),
