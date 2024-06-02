@@ -24,9 +24,10 @@ class TodoProvider with ChangeNotifier{
       "eventMonth": event['month'],
       "eventDay": event['day'],
       "is_executed": false
-    };
-    final headers = {'Content-Type': 'application/json'};
-    final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(request));
+    }; //tout ce qui est dans le request, c'est tout ce qui est vient du front
+    final headers = {'Content-Type': 'application/json'}; 
+    final response = await http.post(Uri.parse(url), headers: headers, body: json.encode(request)); //cette ligne nous permet de discuter avec le back pour qu'il discute avec la BDD
+    //la requête est encodé en json, l'url est transformé en uri, await attend une réponse 
     Map<String, dynamic> responsePayload = json.decode(response.body);
     final todo = TodoItem(
         id: responsePayload["id"],
@@ -57,8 +58,7 @@ class TodoProvider with ChangeNotifier{
       "is_executed": false
     };
     final headers = {'Content-Type': 'application/json'};
-    final response = await http.patch(Uri.parse("$url/$id"), headers: headers, body: json.encode(request));
-      
+    await http.patch(Uri.parse("$url/$id"), headers: headers, body: json.encode(request));   
   }
 
  Future<void> getTodos(DateTime selectedDay) async {
@@ -83,8 +83,12 @@ class TodoProvider with ChangeNotifier{
         eventDay: e['eventDay'],
         isExecuted: e['is_executed']
       )).toList();
-      print(formattedDate);
-      _items.forEach((element) {print("event num ${element.id} ${element.eventYear} ${element.eventMonth} ${element.eventDay}");});
+      if (kDebugMode) { //test dans le terminal
+        print(formattedDate);
+      }
+      for (var element in _items) {if (kDebugMode) {
+        print("event num ${element.id} ${element.eventYear} ${element.eventMonth} ${element.eventDay}");
+      }}
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -99,7 +103,7 @@ class TodoProvider with ChangeNotifier{
       final response = await http.delete(Uri.parse('$url/$id'));
       if (kDebugMode) {
         print('Server response: ${response.body}');
-      } // Ajoutez cette ligne
+      }
 
       if (response.statusCode == 200) {
         _items.removeWhere((item) => item.id == id);
@@ -130,32 +134,4 @@ class TodoProvider with ChangeNotifier{
     }
     notifyListeners();
   }
-
-//fonction à garder !!!!!!!!!!!
-//   Future<void> getTodos2(DateTime selectedDay) async {
-//     http.Response response;
-//     try {
-//       // Convert the selected date to a string in the format 'yyyy-MM-dd'
-//       String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
-      
-//       // Append the date as a query parameter to the URL
-//       String requestUrl = "$url?date=$formattedDate";
-      
-//       response = await http.get(Uri.parse(requestUrl));
-//       List<dynamic> body = json.decode(response.body);
-      
-//       _items = body.map((e) => TodoItem(
-//         id: e['id'],
-//         eventName: e['eventName'],
-//         eventStart: e['eventStart'],
-//         eventEnd: e['eventEnd'],
-//         eventLocation: e['eventLocation'],
-//         eventDescription: e['eventDescription'],
-//         isExecuted: e['is_executed']
-//       )).toList();
-//     } catch (e) {
-//       print(e);
-//     }
-//     notifyListeners();
-//   }
 }
