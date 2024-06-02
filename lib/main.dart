@@ -140,8 +140,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Consumer<TodoProvider>(
                     builder: (context, todoProvider, child) {
                       // Récupère les événements pour le jour sélectionné
+                      print("pommr");
                       var eventsForSelectedDay = todoProvider.items.where((item) {
-                        return isSameDay(_selectedDay, _selectedDay);
+                        return isSameDay(_selectedDay, item.date);
                       }).toList();
                       return _selectedDay == null
                           ? const Center(child: Text('Sélectionnez une date pour voir les événements'))
@@ -182,10 +183,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                               IconButton(
                                                 icon: const Icon(Icons.delete), //icône pour supprimer
                                                 onPressed: () {
+                                                  //pour déclencher la reconstruction du widget?
                                                   todoProvider.deleteTodo(event.id);
-                                                  setState(() {
-                                                    id = event.id;
-                                                    }); //pour déclencher la reconstruction du widget?
+                                                  
                                                 },
                                               ),
                                             ],

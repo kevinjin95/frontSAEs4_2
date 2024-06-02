@@ -9,6 +9,7 @@ class TodoItem{
   int eventMonth;
   int eventDay;
   bool isExecuted;
+  DateTime date = DateTime.now();
   TodoItem({this.id, required this.eventName, 
                     required this.eventStart,
                     required this.eventEnd, 
@@ -17,5 +18,7 @@ class TodoItem{
                     required this.eventYear, 
                     required this.eventMonth, 
                     required this.eventDay,
-                    required this.isExecuted});
+                    required this.isExecuted}) {
+      date = DateTime(eventYear, eventMonth, eventDay);
+    }
 }
