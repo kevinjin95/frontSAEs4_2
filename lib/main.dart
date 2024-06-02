@@ -70,9 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TodoProvider>(context, listen: false).getTodos(_focusedDay);
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TodoProvider>(context, listen: false).deleteTodo(id);
-    });
   }
 
   @override
