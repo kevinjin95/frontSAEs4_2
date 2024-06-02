@@ -186,12 +186,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                             children: [
                                               IconButton(
                                                 icon: const Icon(Icons.assignment_add), //icône pour supprimer
-                                                onPressed: () {
+                                                onPressed: () => _showEditEventDialog(_selectedDay!, event),
                                                   //todoProvider.deleteTodo(event.id);
                                                   // setState(() {
                                                   //   id = event.id;
                                                   //   }); //pour déclencher la reconstruction du widget?
-                                                },
+                                                
                                               ),
                                               IconButton(
                                                 icon: const Icon(Icons.delete), //icône pour supprimer
@@ -333,6 +333,116 @@ class _MyHomePageState extends State<MyHomePage> {
               newTaskController.clear();
             },
             child: Text(event == null ? 'Ajouter' : 'Modifier'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditEventDialog(DateTime selectedDay, TodoItem event) {
+    TextEditingController nameController = TextEditingController(text: event.eventName);
+    TextEditingController startController = TextEditingController(text: event.eventStart);
+    TextEditingController endController = TextEditingController(text: event.eventEnd);
+    TextEditingController locationController = TextEditingController(text: event.eventLocation);
+    TextEditingController descriptionController = TextEditingController(text: event.eventDescription);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.green[100],
+        title: const Text('Modifier un événement'),
+        content: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Titre',
+                ),
+              ),
+              TextField(
+                controller: startController,
+                decoration: const InputDecoration(
+                  labelText: 'Heure de début (HH:mm)',
+                ),
+                onTap: () async {
+                  TimeOfDay? time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (time != null) {
+                    // ignore: use_build_context_synchronously
+                    startController.text = time.format(context);
+                  }
+                },
+              ),
+              TextField(
+                controller: endController,
+                decoration: const InputDecoration(
+                  labelText: 'Heure de fin (HH:mm)',
+                ),
+                onTap: () async {
+                  TimeOfDay? time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (time != null) {
+                    // ignore: use_build_context_synchronously
+                    endController.text = time.format(context);
+                  }
+                },
+              ),
+              TextField(
+                controller: locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Lieu',
+                ),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.isEmpty ||
+                  startController.text.isEmpty ||
+                  endController.text.isEmpty ||
+                  locationController.text.isEmpty ||
+                  descriptionController.text.isEmpty) {
+                return;
+              }
+              setState(() {
+                newEvent = {
+                  'name': nameController.text,
+                  'start': startController.text,
+                  'end': endController.text,
+                  'location': locationController.text,
+                  'description': descriptionController.text,
+                  'year': selectedDay.year,
+                  'month': selectedDay.month,
+                  'day': selectedDay.day,
+                };
+              });
+              Provider.of<TodoProvider>(context, listen: false).editTodo(event.id, newEvent).then((value) {
+              Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
+                Navigator.pop(context);
+                
+              });
+              newTaskController.clear();
+            },
+            child: const Text('Modifier'),
           ),
         ],
       ),

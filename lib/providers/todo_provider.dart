@@ -44,13 +44,28 @@ class TodoProvider with ChangeNotifier{
     notifyListeners();
   }
 
+  Future<void> editTodo(int id, Map<String, dynamic> event) async {
+    Map<String, dynamic> request = {
+      "eventName": event['name'] , 
+      "eventStart": event['start'], 
+      "eventEnd": event['end'], 
+      "eventLocation": event['location'],
+      "eventDescription": event['description'],
+      "eventYear": event['year'],
+      "eventMonth": event['month'],
+      "eventDay": event['day'],
+      "is_executed": false
+    };
+    final headers = {'Content-Type': 'application/json'};
+    final response = await http.patch(Uri.parse("$url/$id"), headers: headers, body: json.encode(request));
+      
+  }
+
  Future<void> getTodos(DateTime selectedDay) async {
     http.Response response;
     try {
-      // Convert the selected date to a string in the format 'yyyy-MM-dd'
       String formattedDate = "${selectedDay.year}-${selectedDay.month.toString().padLeft(2, '0')}-${selectedDay.day.toString().padLeft(2, '0')}";
       
-      // Append the date as a query parameter to the URL
       String requestUrl = "$url?date=$formattedDate";
       
       response = await http.get(Uri.parse(requestUrl));
@@ -68,6 +83,8 @@ class TodoProvider with ChangeNotifier{
         eventDay: e['eventDay'],
         isExecuted: e['is_executed']
       )).toList();
+      print(formattedDate);
+      _items.forEach((element) {print("event num ${element.id} ${element.eventYear} ${element.eventMonth} ${element.eventDay}");});
     } catch (e) {
       if (kDebugMode) {
         print(e);
