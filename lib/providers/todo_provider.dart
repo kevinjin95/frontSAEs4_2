@@ -20,9 +20,9 @@ class TodoProvider with ChangeNotifier{
       "eventEnd": event['end'], 
       "eventLocation": event['location'],
       "eventDescription": event['description'],
-      //"eventYear": event['year'],
-      //"eventMonth": event['month'],
-      //"eventDay": event['day'],
+      "eventYear": event['year'],
+      "eventMonth": event['month'],
+      "eventDay": event['day'],
       "is_executed": false
     };
     final headers = {'Content-Type': 'application/json'};
@@ -35,9 +35,9 @@ class TodoProvider with ChangeNotifier{
         eventEnd: responsePayload["eventEnd"],
         eventLocation: responsePayload["eventLocation"],
         eventDescription: responsePayload["eventDescription"],
-        // eventYear: responsePayload["eventYear"],
-        // eventMonth: responsePayload["eventMonth"],
-        // eventDay: responsePayload["eventDay"],
+        eventYear: responsePayload["eventYear"],
+        eventMonth: responsePayload["eventMonth"],
+        eventDay: responsePayload["eventDay"],
         isExecuted: responsePayload["is_executed"]
     );
     _items.add(todo);
@@ -63,9 +63,9 @@ class TodoProvider with ChangeNotifier{
         eventEnd: e['eventEnd'],
         eventLocation: e['eventLocation'],
         eventDescription: e['eventDescription'],
-        // eventYear: e['eventYear'],
-        // eventMonth: e['eventMonth'],
-        // eventDay: e['eventDay'],
+        eventYear: e['eventYear'],
+        eventMonth: e['eventMonth'],
+        eventDay: e['eventDay'],
         isExecuted: e['is_executed']
       )).toList();
     } catch (e) {
@@ -76,8 +76,6 @@ class TodoProvider with ChangeNotifier{
     }
     notifyListeners();
   }
-
-
 
   Future<void> deleteTodo(int id) async {
     try {

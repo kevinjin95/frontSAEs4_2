@@ -55,9 +55,9 @@ class _MyHomePageState extends State<MyHomePage> {
     'end': '',
     'location': '',
     'description': '',
-    // 'year': 0,
-    // 'month': 0,
-    // 'day': 0,
+    'year': 0,
+    'month': 0,
+    'day': 0,
   };
 
   // valeur de l'id à supprimer
@@ -217,9 +217,6 @@ class _MyHomePageState extends State<MyHomePage> {
     TextEditingController endController = TextEditingController(text: event?['end'] ?? '');
     TextEditingController locationController = TextEditingController(text: event?['location'] ?? '');
     TextEditingController descriptionController = TextEditingController(text: event?['description'] ?? '');
-    // TextEditingController yearController = TextEditingController(text: event?['year'] ?? '');
-    // TextEditingController monthController = TextEditingController(text: event?['month'] ?? '');
-    // TextEditingController dayController = TextEditingController(text: event?['day'] ?? '');
 
     showDialog(
       context: context,
@@ -305,6 +302,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   'end': endController.text,
                   'location': locationController.text,
                   'description': descriptionController.text,
+                  'year': selectedDay.year,
+                  'month': selectedDay.month,
+                  'day': selectedDay.day,
                 };
               });
               Navigator.pop(context);
