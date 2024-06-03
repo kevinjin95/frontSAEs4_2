@@ -127,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       children: [
                         Expanded(
                           child: TableCalendar(
+                            headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
                             focusedDay: _focusedDay,
                             firstDay: DateTime(2020),
                             lastDay: DateTime(2030),
