@@ -159,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(1.0),
+                          padding: const EdgeInsets.all(20.0),
                           child: ElevatedButton(
                             onPressed: () => _showAddEventDialog(_selectedDay!),
                             child: const Text('Ajouter un évènement'),
