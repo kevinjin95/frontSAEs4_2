@@ -20,13 +20,21 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'In Time',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primaryColor: const Color.fromRGBO(28, 107, 68, 1), // Votre couleur RGB
+          appBarTheme: const AppBarTheme(
+            titleTextStyle: TextStyle(
+              color: Colors.white, // Titre en blanc
+              fontSize: 20.0, // Ajoutez cette ligne pour augmenter la taille du titre
+            ),
+          ),
         ),
         home: const MyHomePage(title: 'Planificateur'),
       ),
     );
   }
 }
+
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -85,15 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.lightGreen[900],
       ),
-      backgroundColor: const Color.fromARGB(255, 177, 230, 255),
+      backgroundColor: const Color.fromARGB(235, 186, 231, 217),
       body: Column(
         children: [
           Expanded(
@@ -102,48 +109,63 @@ class _MyHomePageState extends State<MyHomePage> {
                 // Colonne pour le calendrier
                 Expanded(
                   flex: 1,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: TableCalendar(
-                          focusedDay: _focusedDay,
-                          firstDay: DateTime(2020),
-                          lastDay: DateTime(2030),
-                          calendarFormat: _calendarFormat,
-                          selectedDayPredicate: (day) {
-                            // Vérifie si le jour est le même que le jour sélectionné
-                            return isSameDay(_selectedDay, day);
-                          },
-                          onDaySelected: (selectedDay, focusedDay) {
-                            // Met à jour le jour sélectionné et le jour en focus
-                            setState(() {
-                              _selectedDay = selectedDay;
-                              _focusedDay = focusedDay;
-                            });
-                            // Récupère les tâches pour le jour sélectionné
-                            Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
-                          },
-                          calendarStyle: const CalendarStyle(
-                            isTodayHighlighted: true,
-                            selectedDecoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                            ),
-                            todayDecoration: BoxDecoration(
-                              color: Colors.orange,
-                              shape: BoxShape.circle,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.5), // Voile transparent blanc cassé
+                      borderRadius: BorderRadius.circular(10), // Bord arrondi pour un beau design UI
+                      boxShadow: [ // Ombre pour un effet 3D
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.5),
+                          spreadRadius: -2,
+                          blurRadius: 18,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.all(10.0), // Marge autour du conteneur
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: TableCalendar(
+                            focusedDay: _focusedDay,
+                            firstDay: DateTime(2020),
+                            lastDay: DateTime(2030),
+                            calendarFormat: _calendarFormat,
+                            selectedDayPredicate: (day) {
+                              // Vérifie si le jour est le même que le jour sélectionné
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              // Met à jour le jour sélectionné et le jour en focus
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                              // Récupère les tâches pour le jour sélectionné
+                              Provider.of<TodoProvider>(context, listen: false).getTodos(selectedDay);
+                            },
+                            calendarStyle: const CalendarStyle(
+                              isTodayHighlighted: true,
+                              selectedDecoration: BoxDecoration(
+                                color: Color(0xFF66DDAA),
+                                shape: BoxShape.circle,
+                              ),
+                              todayDecoration: BoxDecoration(
+                                color: Color.fromARGB(255, 51, 105, 30),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: ElevatedButton(
-                          onPressed: () => _showAddEventDialog(_selectedDay!),
-                          child: const Text('Ajouter un évènement'),
+                        Padding(
+                          padding: const EdgeInsets.all(1.0),
+                          child: ElevatedButton(
+                            onPressed: () => _showAddEventDialog(_selectedDay!),
+                            child: const Text('Ajouter un évènement'),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 // Colonne pour les événements
@@ -153,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     builder: (context, todoProvider, child) {
                       // Récupère les événements pour le jour sélectionné
                       if (kDebugMode) {
-                        print("pomme"); //
+                        //print("pomme"); pour tester
                       }
                       return _selectedDay == null
                           ? const Center(child: Text('Sélectionnez une date pour voir les événements'))
@@ -225,6 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
 
   void _showAddEventDialog(DateTime selectedDay, {Map<String, String>? event}) {
     TextEditingController nameController = TextEditingController(text: event?['name'] ?? '');
